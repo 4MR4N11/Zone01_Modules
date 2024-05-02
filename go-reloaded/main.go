@@ -21,6 +21,7 @@ func main() {
 		os.Exit(1)
 	}
 	newData := utils.SearchAndReplaceOp(string(data))
+	newData = utils.VowelHandler(newData)
 	newData = utils.PunctHandler(newData)
 	newData = utils.Quotehandler(newData)
 	_, err = file.WriteString(newData)

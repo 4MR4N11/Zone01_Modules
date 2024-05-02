@@ -1,11 +1,8 @@
 package reloaded
 
 import (
-	// "fmt"
-	"fmt"
 	"regexp"
 	"strings"
-	// "strconv"
 )
 
 func validOp(op string) bool {
@@ -24,7 +21,6 @@ func SearchAndReplaceOp(str string) string {
 			regMatches = append(regMatches, m)
 		}
 	}
-	fmt.Println(regMatches)
 	for _, m := range regMatches {
 		if strings.HasSuffix(str, " "+m) || strings.HasPrefix(str, m+" ") || strings.Contains(str, " "+m+" ") {
 			if strings.HasSuffix(str, " "+m) {
@@ -43,6 +39,5 @@ func SearchAndReplaceOp(str string) string {
 			str = ""
 		}
 	}
-	fmt.Println(str)
 	return str
 }
