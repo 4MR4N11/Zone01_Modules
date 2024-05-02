@@ -33,19 +33,19 @@ func runeToUpper(char rune) rune {
 }
 
 func Capitalize(s string) string {
-	tmp := []rune(s)
-	for i := 0; i < len(tmp); i++ {
-		if runeIsAlpha(tmp[i]) {
+	str := []rune(s)
+	for i := 0; i < len(str); i++ {
+		if runeIsAlpha(str[i]) {
 			if i == 0 {
-				tmp[i] = runeToUpper(tmp[i])
-			} else if i-2 >= 0 && !runeIsAlphaNum(tmp[i-1]) {
-				if (tmp[i-1] == '\'' && tmp[i-2] == ' ') || tmp[i-1] == ' ' {
-					tmp[i] = runeToUpper(tmp[i])
+				str[i] = runeToUpper(str[i])
+			} else if i-2 >= 0 && !runeIsAlphaNum(str[i-1]) {
+				if (str[i-1] == '\'' && str[i-2] == ' ') || str[i-1] == ' ' {
+					str[i] = runeToUpper(str[i])
 				}
-			} else if !runeIsLower(tmp[i]) {
-				tmp[i] += 32
+			} else if !runeIsLower(str[i]) {
+				str[i] += 32
 			}
 		}
 	}
-	return string(tmp)
+	return string(str)
 }

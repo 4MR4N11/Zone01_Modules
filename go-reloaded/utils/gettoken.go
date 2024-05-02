@@ -6,8 +6,8 @@ import (
 )
 
 func notSpace(str string) bool {
-	for _, c := range str {
-		if c != ' ' {
+	for _, char := range str {
+		if char != ' ' {
 			return true
 		}
 	}

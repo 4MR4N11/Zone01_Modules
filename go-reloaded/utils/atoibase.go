@@ -1,8 +1,6 @@
 package reloaded
 
-import (
-	"strings"
-)
+import "strings"
 
 func valid(base string, s string) bool {
 	tmp := []rune(base)
@@ -32,6 +30,7 @@ func valid(base string, s string) bool {
 	}
 	return true
 }
+
 func AtoiBase(s string, base string) int {
 	res := 0
 	if IsLower(s) {

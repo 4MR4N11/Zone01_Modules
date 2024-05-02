@@ -1,8 +1,6 @@
 package reloaded
 
-import (
-	"strings"
-)
+import "strings"
 
 func Quotehandler(data string) string {
 	tmp := ""

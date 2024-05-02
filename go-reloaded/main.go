@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strings"
 
 	utils "reloaded/utils"
 )
@@ -20,12 +21,18 @@ func main() {
 	if err != nil {
 		os.Exit(1)
 	}
-	newData := utils.SearchAndReplaceOp(string(data))
-	newData = utils.VowelHandler(newData)
-	newData = utils.PunctHandler(newData)
-	newData = utils.Quotehandler(newData)
-	_, err = file.WriteString(newData)
-	if err != nil {
-		os.Exit(1)
+	tmpData := strings.Split(string(data), "\n")
+	for i, line := range tmpData {
+		newData := utils.SearchAndReplaceOp(string(line))
+		newData = utils.VowelHandler(newData)
+		newData = utils.PunctHandler(newData)
+		newData = utils.Quotehandler(newData)
+		if i != len(tmpData)-1 {
+			newData += "\n"
+		}
+		_, err = file.WriteString(newData)
+		if err != nil {
+			os.Exit(1)
+		}
 	}
 }
