@@ -20,7 +20,7 @@ func Getmatch(str string, op string) string {
 	if index != -1 {
 		if strings.Contains(op, ", ") {
 			tmp := strings.Split(strings.TrimSpace(op), ", ")
-			if tmp[0] == "(up" || tmp[0] == "(low" || tmp[0] == "(cap" {
+			if len(tmp) > 0 && (tmp[0] == "(up" || tmp[0] == "(low" || tmp[0] == "(cap") {
 				num, err := strconv.Atoi(strings.Trim(tmp[1], ")"))
 				if err == nil {
 					for i := index - 1; i >= 0; i-- {

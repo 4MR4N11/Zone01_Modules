@@ -13,7 +13,7 @@ func validOp(op string) bool {
 }
 
 func SearchAndReplaceOp(str string) string {
-	reg := regexp.MustCompile(`\((\w+)(?:,\s(\d*[1-9]\d*))?\)`)
+	reg := regexp.MustCompile(`\((\w+)(?:,\s(\d+))?\)`)
 	regTmp := reg.FindAllString(str, -1)
 	regMatches := []string{}
 	for _, m := range regTmp {
@@ -29,7 +29,7 @@ func SearchAndReplaceOp(str string) string {
 				str = strings.ReplaceAll(str, match+m, Converting(match, strings.TrimSpace(m)))
 			} else if strings.HasPrefix(str, m+" ") {
 				m = m + " "
-				str = strings.TrimLeft(str, m)
+				str = str[len(m):]
 			} else {
 				m = " " + m
 				match := Getmatch(str, m)

@@ -1,19 +1,29 @@
 package reloaded
 
-import (
-	"regexp"
-	"strings"
-)
+import "strings"
 
-func VowelHandler(data string) string {
-	reg := regexp.MustCompile(`\b[aA]\s+[aeiouhAEIOUH]`)
-	regMatches := reg.FindAllString(data, -1)
-	for _, m := range regMatches {
-		if m[0] == 'a' {
-			data = strings.ReplaceAll(data, m, "an "+m[2:])
-		} else {
-			data = strings.ReplaceAll(data, m, "An "+m[2:])
+func isVowel(data rune) bool {
+	vowels := "aeiouhAEIOUH"
+	for _, v := range vowels {
+		if data == v {
+			return true
 		}
 	}
+	return false
+}
+
+func VowelHandler(data string) string {
+	tmp := strings.Split(data, " ")
+	for i := 0; i < len(tmp); i++ {
+		if tmp[i] == "a" || tmp[i] == "A" {
+			j := i + 1
+			for ; j < len(tmp) && len(tmp[j]) == 0; j++ {
+			}
+			if j < len(tmp) && len(tmp[j]) > 0 && isVowel(rune(tmp[j][0])) {
+				tmp[i] += "n"
+			}
+		}
+	}
+	data = strings.Join(tmp, " ")
 	return data
 }
