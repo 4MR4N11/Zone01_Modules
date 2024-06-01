@@ -6,22 +6,24 @@ import (
 	"strings"
 )
 
-func AsciiArtGenerator(data, banner string) string {
+func AsciiArtGenerator(data, banner string) (string, int) {
 	fmt.Println(banner)
 	asciiFile, err := os.ReadFile("utils/" + banner + ".txt")
 	if err != nil {
 		fmt.Println(err)
-		os.Exit(1)
+		return "", 1
 	}
 	asciiCharacters := strings.ReplaceAll(string(asciiFile), "\r", "")
 	asciiTable := AsciiTableMaker(asciiCharacters)
 	arg := strings.ReplaceAll(data, "\\n", "\n")
+	arg = strings.ReplaceAll(data, "\r", "")
+
 	arr := strings.Split(arg, "\n")
 	for _, str := range arr {
 		for _, c := range str {
 			if c < ' ' || c > '~' {
 				fmt.Println("Error: Character out of range.")
-				os.Exit(1)
+				return "", 1
 			}
 		}
 	}
@@ -44,5 +46,5 @@ func AsciiArtGenerator(data, banner string) string {
 			}
 		}
 	}
-	return output
+	return output, 0
 }
