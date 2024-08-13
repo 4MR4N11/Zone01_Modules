@@ -5,6 +5,8 @@ import (
 	"html/template"
 	"net/http"
 
+	// "strings"
+
 	utils "ascii_web/utils"
 )
 
@@ -45,39 +47,19 @@ func AsciiArtResult(w http.ResponseWriter, r *http.Request) {
 
 func RootPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, "405: Method not allowed.", http.StatusMethodNotAllowed)
-		return
-	}
-
-	t, err := template.ParseFiles("templates/index.html")
-	if err != nil {
-		http.Error(w, "500: Internal Server Error.", http.StatusInternalServerError)
-		return
-	}
-
-	err = t.Execute(w, nil)
-	if err != nil {
-		http.Error(w, "500: Internal Server Error.", http.StatusInternalServerError)
-		return
-	}
-}
-
-func fileHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
 		errorPages(w, 405)
 		return
 	}
-
-	asciiArt := r.FormValue("ascii-art")
-	if asciiArt == "" {
-		errorPages(w, 400)
+	t, err := template.ParseFiles("templates/index.html")
+	if err != nil {
+		errorPages(w, 500)
 		return
 	}
-
-	w.Header().Set("Content-Disposition", "attachment; filename=ascii-art.txt")
-	w.Header().Set("Content-Type", "text/plain")
-	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(asciiArt)))
-	w.Write([]byte(asciiArt))
+	err = t.Execute(w, nil)
+	if err != nil {
+		errorPages(w, 500)
+		return
+	}
 }
 
 func errorPages(w http.ResponseWriter, code int) {
@@ -125,10 +107,6 @@ func main() {
 		RootPage(w, r)
 	})
 	http.HandleFunc("/ascii-art", AsciiArtResult)
-	http.HandleFunc("/download", fileHandler)
 	fmt.Println("\033[32mServer started at http://127.0.0.1:8080\033[0m")
-	err := http.ListenAndServe("127.0.0.1:8080", nil)
-	if err != nil {
-		fmt.Printf("Server failed to start: %v\n", err)
-	}
+	http.ListenAndServe("127.0.0.1:8080", nil)
 }
