@@ -11,12 +11,11 @@ import (
 	utils "my_ls/utils"
 )
 
-func LFlag(d *os.File, path string, lowerR bool) {
+func LFlag(d *os.File, path string, lowerR bool) []string {
 	results := []myStructs.Result{}
 	resultsLen := []myStructs.ResultLen{}
 	files, _ := d.Readdir(-1)
-	totalSize := utils.GetTotalSize(files)
-	fmt.Println("total", totalSize)
+	totalSize := fmt.Sprintln("total", strconv.Itoa(utils.GetTotalSize(files)))
 	if lowerR {
 		files = utils.RevSortFiles(files)
 	} else {
@@ -67,5 +66,5 @@ func LFlag(d *os.File, path string, lowerR bool) {
 		results = append(results, tmp)
 		resultsLen = append(resultsLen, lenTmp)
 	}
-	utils.PrintResults(results, resultsLen)
+	return utils.PrintResults(results, resultsLen, totalSize)
 }

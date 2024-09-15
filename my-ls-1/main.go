@@ -6,59 +6,10 @@ import (
 	"strings"
 
 	parser "my_ls/Parser"
-	execFlag "my_ls/flags"
+	execute "my_ls/execute"
 	myStructs "my_ls/models"
 	utils "my_ls/utils"
 )
-
-func ExecFlags(Input myStructs.Args) {
-	for i, path := range Input.Path {
-		defer path.OpenedPath.Close()
-		if len(Input.Path) > 1 {
-			fmt.Println(path.Path + ":")
-		}
-		if Input.Flags.L {
-			execFlag.LFlag(path.OpenedPath, path.Path, Input.Flags.LowerR)
-			if i+1 < len(Input.Path) {
-				fmt.Println()
-			}
-		} else if Input.Flags.UpperR {
-		} else {
-			ExecNoFlags(path.OpenedPath, Input.Flags.LowerR)
-			if i+1 < len(Input.Path) {
-				fmt.Println()
-			}
-		}
-	}
-}
-
-func ExecNoFlags(openedFile *os.File, lowerR bool) {
-	results := []string{}
-	files, err := openedFile.Readdir(-1)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(2)
-	}
-	if lowerR {
-		files = utils.RevSortFiles(files)
-	} else {
-		files = utils.SortFiles(files)
-	}
-	for _, file := range files {
-		fmt.Println(file.Name())
-		if file.Name()[0] == '.' {
-			continue
-		}
-		results = append(results, file.Name())
-	}
-	for i, file := range results {
-		if i+1 < len(results) {
-			fmt.Print(file + "  ")
-		} else {
-			fmt.Print(file + "\n")
-		}
-	}
-}
 
 func main() {
 	args := os.Args[1:]
@@ -78,13 +29,8 @@ func main() {
 		}
 		Input.Path = append(Input.Path, path)
 		utils.SortPaths(&Input.Path)
-		ExecNoFlags(path.OpenedPath, Input.Flags.LowerR)
+		fmt.Print(execute.ExecNoFlags(path.OpenedPath))
 		return
 	}
-	if Input.Flags.LowerR {
-		utils.RevSortPaths(&Input.Path)
-	} else {
-		utils.SortPaths(&Input.Path)
-	}
-	ExecFlags(Input)
+	execute.ExecFlags(Input)
 }

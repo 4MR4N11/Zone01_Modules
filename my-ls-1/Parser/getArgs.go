@@ -51,7 +51,7 @@ func GetArgs(args []string) models.Args {
 			}
 		}
 	}
-	if len(result.Path) == 0 && check == 0 {
+	if len(paths) == 0 && check == 0 {
 		p := models.Path{}
 		tmp, err := os.Open(".")
 		if err != nil {

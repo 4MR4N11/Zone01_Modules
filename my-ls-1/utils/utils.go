@@ -34,6 +34,9 @@ func CountDir(dir fs.FileInfo) int {
 func GetTotalSize(files []fs.FileInfo) int {
 	totalSize := 0
 	for _, f := range files {
+		if f.Name()[0] == '.' {
+			continue
+		}
 		tmp := 4
 		if f.Size() > 4096 {
 			tmp = int(f.Size()) / 1024
@@ -103,13 +106,15 @@ func addSpaces(str string, num int) string {
 	return str
 }
 
-func PrintResults(results []myStructs.Result, resultsLen []myStructs.ResultLen) {
+func PrintResults(results []myStructs.Result, resultsLen []myStructs.ResultLen, totalSize string) []string {
 	permsMax := findMaxLen(resultsLen, "Perms")
 	numMax := findMaxLen(resultsLen, "Num")
 	userOwnMax := findMaxLen(resultsLen, "UserOwn")
 	GroupOwnMax := findMaxLen(resultsLen, "GroupOwn")
 	sizeMax := findMaxLen(resultsLen, "Size")
 	dateMax := findMaxLen(resultsLen, "Date")
+	output := []string{}
+	output = append(output, totalSize)
 	for i, result := range results {
 		if resultsLen[i].Perms < permsMax {
 			result.Perms = addSpaces(result.Perms, permsMax-resultsLen[i].Perms)
@@ -129,8 +134,9 @@ func PrintResults(results []myStructs.Result, resultsLen []myStructs.ResultLen) 
 		if resultsLen[i].Date < dateMax {
 			result.Date = addSpaces(result.Date, dateMax-resultsLen[i].Date)
 		}
-		fmt.Println(result.Perms, result.Num, result.UserOwn, result.GroupOwn, result.Size, result.Date, result.Name)
+		output = append(output, fmt.Sprintln(result.Perms, result.Num, result.UserOwn, result.GroupOwn, result.Size, result.Date, result.Name))
 	}
+	return output
 }
 
 func SortFiles(files []fs.FileInfo) []fs.FileInfo {
@@ -181,7 +187,7 @@ func RevSortFiles(files []fs.FileInfo) []fs.FileInfo {
 
 func SortPaths(Paths *[]myStructs.Path) {
 	for i := 0; i < len(*Paths); i++ {
-		if i+1 < len((*Paths)) && strings.ToLower((*Paths)[i].Path) < strings.ToLower((*Paths)[i+1].Path) {
+		if i+1 < len((*Paths)) && strings.ToLower((*Paths)[i].Path) > strings.ToLower((*Paths)[i+1].Path) {
 			tmp := (*Paths)[i]
 			(*Paths)[i] = (*Paths)[i+1]
 			(*Paths)[i+1] = tmp
@@ -192,7 +198,7 @@ func SortPaths(Paths *[]myStructs.Path) {
 
 func RevSortPaths(Paths *[]myStructs.Path) {
 	for i := 0; i < len(*Paths); i++ {
-		if i+1 < len((*Paths)) && strings.ToLower((*Paths)[i].Path) > strings.ToLower((*Paths)[i+1].Path) {
+		if i+1 < len((*Paths)) && strings.ToLower((*Paths)[i].Path) < strings.ToLower((*Paths)[i+1].Path) {
 			tmp := (*Paths)[i]
 			(*Paths)[i] = (*Paths)[i+1]
 			(*Paths)[i+1] = tmp
