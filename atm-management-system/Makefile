@@ -1,19 +1,31 @@
-objects = src/main.o src/system.o src/auth.o src/utils.o src/registration.o
+SRCS = src/main.c src/newAccount.c src/auth.c src/database.c src/utils.c src/registration.c src/checkAccount.c src/updateAccount.c src/deleteAccount.c src/transaction.c src/transfer.c
 
-atm : $(objects)
-	cc -o atm $(objects)
+OBJECT = $(SRCS:src/%.c=src/%.o)
 
-# main.o : src/header.h
-# kbd.o : src/header.h
-# command.o : src/header.h
-# display.o : src/header.h
-# insert.o : src/header.h
-# search.o : src/header.h
-# files.o : src/header.h
-# utils.o : src/header.h
+NAME = atm
+
+HEADER = src/header.h
+
+FLAGS = -lsqlite3
+
+all : $(NAME)
+
+$(NAME) : $(OBJECT)
+	cc -o $(NAME) $(OBJECT) $(FLAGS)
+	sleep 0.5
+	clear
+
+src/%.o: src/%.c $(HEADER)
+	cc -c $< -o $@
 
 clean :
-	rm -f $(objects)
+	rm -rf $(OBJECT)
+	sleep 0.5
+	clear
 
 fclean : clean
-	rm -f atm
+	rm -rf $(NAME)
+	sleep 0.5
+	clear
+
+re : fclean all

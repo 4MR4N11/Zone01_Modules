@@ -3,6 +3,8 @@
 void mainMenu(struct User u)
 {
     int option;
+    char *input;
+unknownAcc:
     system("clear");
     printf("\n\n\t\t======= ATM =======\n\n");
     printf("\n\t\t-->> Feel free to choose one of the options below <<--\n");
@@ -14,95 +16,123 @@ void mainMenu(struct User u)
     printf("\n\t\t[6]- Remove existing account\n");
     printf("\n\t\t[7]- Transfer ownership\n");
     printf("\n\t\t[8]- Exit\n");
-    scanf("%d", &option);
-
+    getPrompt(&input);
+    option = atoi(input);
     switch (option)
     {
     case 1:
         createNewAcc(u);
-        break;
     case 2:
-        // student TODO : add your **Update account information** function
-        // here
-        break;
+        system("clear");
+        printf("What is the account number you want to change:");
+        getPrompt(&input);
+        if (updateAccount(u, input))
+            goto unknownAcc;
+        system("clear");
+        printf("\n✔ Success!\n\n");
+        success(u);
+        goto unknownAcc;
     case 3:
-        // student TODO : add your **Check the details of existing accounts** function
-        // here
-        break;
+        system("clear");
+        printf("\nEnter the account number:");
+        getPrompt(&input);
+        if (checkAccount(u, input, 0))
+            goto unknownAcc;
+        system("clear");
+        success(u);
+        goto unknownAcc;
     case 4:
         checkAllAccounts(u);
-        break;
+        goto unknownAcc;
     case 5:
-        // student TODO : add your **Make transaction** function
-        // here
-        break;
+        system("clear");
+        printf("Enter the account number of the customer: ");
+        getPrompt(&input);
+        if (transaction(u, input))
+            goto unknownAcc;
+        system("clear");
+        printf("\n✔ Success!\n\n");
+        success(u);
+        goto unknownAcc;
     case 6:
-        // student TODO : add your **Remove existing account** function
-        // here
-        break;
+        system("clear");
+        printf("What is the account number you want to delete:");
+        getPrompt(&input);
+        if (deleteAccount(u, input))
+            goto unknownAcc;
+        printf("\n✔ Success!\n\n");
+        success(u);
+        system("clear");
+        goto unknownAcc;
     case 7:
-        // student TODO : add your **Transfer owner** function
-        // here
-        break;
+        system("clear");
+        printf("Enter the account number you want to transfer ownership:");
+        getPrompt(&input);
+        if (transfer(u, input))
+            goto unknownAcc;
+        printf("\n✔ Success!\n\n");
+        success(u);
+        system("clear");
+        goto unknownAcc;
     case 8:
         exit(1);
-        break;
     default:
         printf("Invalid operation!\n");
+        fflush(stdout);
+        goto unknownAcc;
     }
-};
+}
 
 void initMenu(struct User *u)
 {
-    int r = 0;
     int option;
+    char *input;
+notFound:
     system("clear");
     printf("\n\n\t\t======= ATM =======\n");
     printf("\n\t\t-->> Feel free to login / register :\n");
     printf("\n\t\t[1]- login\n");
     printf("\n\t\t[2]- register\n");
     printf("\n\t\t[3]- exit\n");
-    while (!r)
+    getPrompt(&input);
+    option = atoi(input);
+    switch (option)
     {
-        scanf("%d", &option);
-        switch (option)
-        {
         case 1:
-            loginMenu(u->name, u->password);
-            if (strcmp(u->password, getPassword(*u)) == 0)
-            {
-                printf("\n\nPassword Match!");
-            }
-            else
-            {
-                printf("\nWrong password!! or User Name\n");
-                exit(1);
-            }
-            r = 1;
-            break;
+            loginMenu(&u);
+            if (!checkAuth(*u))
+                return;
+            printf("\nWrong password!! or User Name\n");
+            fflush(stdout);
+            sleep(1);
+            goto notFound;
         case 2:
-            registerMenu(u->name, u->password);
-            if (checkUser(*u) == 1)
-            {
-                printf("\nUsername already exists!!\n");
-                exit(1);
-            }
-            addUser(u->name, u->password);
-            r = 1;
-            break;
+            registerMenu(&u);
+            if (!insertUser(*u))
+                return;
+            printf("\nUser already exists!\n");
+            fflush(stdout);
+            sleep(1);
+            goto notFound;
         case 3:
+            sqlite3_close(db);
             exit(1);
-            break;
+            goto notFound;
         default:
             printf("Insert a valid operation!\n");
-        }
+            fflush(stdout);
+            sleep(1);
+            goto notFound;
     }
-};
+}
 
 int main()
 {
     struct User u;
-    
+
+
+    createDatabase();
+    initDatabase();
     initMenu(&u);
     mainMenu(u);
     return 0;

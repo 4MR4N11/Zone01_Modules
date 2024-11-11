@@ -1,6 +1,0 @@
-0 Alice 12345
-1 Michel 123456
-2 khalid 1234
-3 mlbahja 20000
-4 kdkdk dkdkdkd
-5 sdz dsz
