@@ -16,8 +16,8 @@ const tetrominoes = [
 ]
 
 let currentPiece = tetrominoes[0]
-let currentX = 0
-let currentY = 4
+let x = 0
+let y = 4
 let dropStart = 0 
 let dropInterval = 400 //ms
 let pause = false
@@ -56,7 +56,7 @@ function placeTetromino() {
     for (let row = 0; row < currentPiece.length; row++) {
         for (let col = 0; col < currentPiece[row].length; col++) {
             if (currentPiece[row][col] === 1) {
-                grid[currentX + row][currentY + col] = 1
+                grid[x + row][y + col] = 1
             }
         }
     }
@@ -66,7 +66,7 @@ function removeTetromino() {
     for (let row = 0; row < currentPiece.length; row++) {
         for (let col = 0; col < currentPiece[row].length; col++) {
             if (currentPiece[row][col] === 1) {
-                grid[currentX + row][currentY + col] = 0
+                grid[x + row][y + col] = 0
             }
         }
     }
@@ -107,9 +107,9 @@ function checkGameOver() {
 
 function moveDown() {
     removeTetromino()
-    currentX++
+    x++
     if (!isValidMove()) {
-        currentX--
+        x--
         fixTetromino()
         spawnTetromino()
     }
@@ -122,10 +122,10 @@ function isValidMove() {
         for (let col = 0; col < currentPiece[row].length; col++) {
             if (
                 currentPiece[row][col] === 1 &&
-                (currentX + row >= ROWS ||
-                    currentY + col < 0 ||
-                    currentY + col >= COLUMNS ||
-                    grid[currentX + row][currentY + col] === 2)
+                (x + row >= ROWS ||
+                    y + col < 0 ||
+                    y + col >= COLUMNS ||
+                    grid[x + row][y + col] === 2)
             ) {
                 return false
             }
@@ -138,7 +138,7 @@ function fixTetromino() {
     for (let row = 0; row < currentPiece.length; row++) {
         for (let col = 0; col < currentPiece[row].length; col++) {
             if (currentPiece[row][col] === 1) {
-                grid[currentX + row][currentY + col] = 2
+                grid[x + row][y + col] = 2
             }
         }
     }
@@ -146,8 +146,8 @@ function fixTetromino() {
 
 function spawnTetromino() {
     currentPiece = tetrominoes[Math.floor(Math.random() * tetrominoes.length)]
-    currentX = 0
-    currentY = Math.floor(COLUMNS / 2) - Math.floor(currentPiece[0].length / 2)
+    x = 0
+    y = Math.floor(COLUMNS / 2) - Math.floor(currentPiece[0].length / 2)
 }
 
 function rotatePiece(counterClockwise = false) {
@@ -172,16 +172,16 @@ document.addEventListener('keydown', (event) => {
     switch (event.key) {
         case 'ArrowLeft':
             removeTetromino()
-            currentY--
-            if (!isValidMove()) currentY++
+            y--
+            if (!isValidMove()) y++
             placeTetromino()
             renderGrid()
             break
 
         case 'ArrowRight':
             removeTetromino()
-            currentY++
-            if (!isValidMove()) currentY--
+            y++
+            if (!isValidMove()) y--
             placeTetromino()
             renderGrid()
             break
@@ -201,9 +201,9 @@ document.addEventListener('keydown', (event) => {
         case ' ':
             removeTetromino()
             while (isValidMove()) {
-                currentX++
+                x++
             }
-            currentX--
+            x--
             placeTetromino()
             fixTetromino()
             spawnTetromino()
