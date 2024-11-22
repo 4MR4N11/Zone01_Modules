@@ -23,13 +23,25 @@ let dropInterval = 400 //ms
 let pause = false
 let gameover = false
 let score = 0
+let timeElapsed = 0;
+let lastTimerUpdate = 0;
 
 function renderGrid() {
     board.innerHTML = ''
     const scoreElement = document.createElement('div')
+    const banner = document.createElement('div')
+    banner.className = 'banner'
     scoreElement.className = 'score'
     scoreElement.textContent = `Score: ${score}`
-    board.appendChild(scoreElement)
+    const timerElement = document.createElement('div')
+    timerElement.id = 'timer'
+    timerElement.textContent = `Time: ${timeElapsed}`
+    banner.style.display = 'flex'
+    banner.style.justifyContent = 'space-between'
+    banner.appendChild(scoreElement)
+    banner.appendChild(timerElement)
+    board.appendChild(banner)
+
     for (let row = 0; row < ROWS; row++) {
         const rowElement = document.createElement('div')
         rowElement.className = 'row'
@@ -229,7 +241,17 @@ function pauseMenu() {
     board.appendChild(pauseMenu)
 }
 
+
+function updateTimer(timestamp) {
+    if (timestamp - lastTimerUpdate >= 1000) {
+        timeElapsed++;
+        lastTimerUpdate = timestamp;
+        document.getElementById('timer').textContent = `Time: ${timeElapsed}`;
+    }
+}
+
 function gameLoop(timestamp) {
+    updateTimer(timestamp)
     if (gameover) {
         alert('Game Over')
         return
