@@ -22,8 +22,14 @@ let dropStart = 0
 let dropInterval = 400 //ms
 let pause = false
 let gameover = false
+let score = 0
+
 function renderGrid() {
     board.innerHTML = ''
+    const scoreElement = document.createElement('div')
+    scoreElement.className = 'score'
+    scoreElement.textContent = `Score: ${score}`
+    board.appendChild(scoreElement)
     for (let row = 0; row < ROWS; row++) {
         const rowElement = document.createElement('div')
         rowElement.className = 'row'
@@ -83,6 +89,7 @@ function clearLines() {
                     grid[row][col] = grid[row - 1][col]
                 }
             }
+            score++
         }
     }
 
