@@ -63,3 +63,25 @@ body {
 .row.active {
     animation: rotate 0.2s linear;
 }
+
+button {
+    background: #2196f3;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 20px 0;
+}
+
+button:hover {
+    background: #0d8bf2;
+}
+
+button:active {
+    background: #0a6fba;
+}
+
+button:focus {
+    outline: none;
+}

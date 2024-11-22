@@ -237,7 +237,24 @@ function pauseMenu() {
     pauseMenu.className = 'pause-menu'
     const pauseText = document.createElement('h1')
     pauseText.textContent = 'Paused'
+    const resumeButton = document.createElement('button')
+    const restartButton = document.createElement('button')
+    const buttons = document.createElement('div')
+    restartButton.textContent = 'Restart'
+    restartButton.addEventListener('click', () => {
+        location.reload()
+    }
+    )
+    resumeButton.textContent = 'Resume'
+    resumeButton.addEventListener('click', () => {
+        pause = false
+        board.removeChild(pauseMenu)
+        requestAnimationFrame(gameLoop)
+    })
+    buttons.appendChild(restartButton)
+    buttons.appendChild(resumeButton)
     pauseMenu.appendChild(pauseText)
+    pauseMenu.appendChild(buttons)
     board.appendChild(pauseMenu)
 }
 
