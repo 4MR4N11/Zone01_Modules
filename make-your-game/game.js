@@ -6,7 +6,7 @@ const COLUMNS = 10
 let grid = Array.from({ length: ROWS }, () => Array(COLUMNS).fill(0))
 
 const tetrominoes = [
-    [[1, 1, 1], [0, 1, 0]],  // T-shape
+    [[0, 1, 0], [1, 1, 1]],  // T-shape
     [[1, 1], [1, 1]],        // O-shape
     [[1, 0, 0], [1, 1, 1]],  // L-shape
     [[0, 0, 1], [1, 1, 1]],  // J-shape
@@ -15,11 +15,24 @@ const tetrominoes = [
     [[1, 1, 1, 1]],          // I-shape
 ]
 
-let currentPiece = tetrominoes[0]
+const colors = [
+    "yellow",
+    "blue",
+    "brown",
+    "red",
+    "chocolate",
+    "purple",
+    "cyan"
+]
+
+let index = Math.floor(Math.random() * tetrominoes.length)
+let currentPiece = tetrominoes[index]
+let color = colors[Math.floor(Math.random() * colors.length)]
 let x = 0
 let y = 4
 let dropStart = 0 
 let dropInterval = 400 //ms
+let start = false
 let pause = false
 let gameover = false
 let score = 0
@@ -50,6 +63,7 @@ function renderGrid() {
             cell.className = 'cell'
             if (grid[row][col] === 1) {
                 cell.classList.add('active')
+                cell.style.backgroundColor = color
             } else if (grid[row][col] === 2) {
                 cell.classList.add('fixed')
             }
@@ -157,7 +171,9 @@ function fixTetromino() {
 }
 
 function spawnTetromino() {
-    currentPiece = tetrominoes[Math.floor(Math.random() * tetrominoes.length)]
+    color = colors[Math.floor(Math.random() * tetrominoes.length)]
+    index = Math.floor(Math.random() * tetrominoes.length)
+    currentPiece = tetrominoes[index]
     x = 0
     y = Math.floor(COLUMNS / 2) - Math.floor(currentPiece[0].length / 2)
 }
@@ -166,7 +182,6 @@ function rotatePiece(counterClockwise = false) {
     const rows = currentPiece.length
     const cols = currentPiece[0].length
     const rotated = Array.from({ length: cols }, () => Array(rows).fill(0))
-
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
             if (counterClockwise) {
@@ -176,56 +191,77 @@ function rotatePiece(counterClockwise = false) {
             }
         }
     }
-
     currentPiece = rotated
 }
 
+let gameState = false
 document.addEventListener('keydown', (event) => {
     switch (event.key) {
         case 'ArrowLeft':
-            removeTetromino()
-            y--
-            if (!isValidMove()) y++
-            placeTetromino()
-            renderGrid()
+            if (gameState) {
+                if (!pause) {
+                    removeTetromino()
+                    y--
+                    if (!isValidMove()) y++
+                    placeTetromino()
+                    renderGrid()
+                }
+            }
             break
-
         case 'ArrowRight':
-            removeTetromino()
-            y++
-            if (!isValidMove()) y--
-            placeTetromino()
-            renderGrid()
+            if (gameState) {
+                if (!pause) {
+                    removeTetromino()
+                    y++
+                    if (!isValidMove()) y--
+                    placeTetromino()
+                    renderGrid()
+                }
+            }
             break
 
         case 'ArrowDown':
-            moveDown()
+            if (gameState) {
+                if (!pause) {
+                    moveDown()
+                }
+            }
             break
 
         case 'ArrowUp':
-            removeTetromino()
-            rotatePiece()
-            if (!isValidMove()) rotatePiece(true)
-            placeTetromino()
-            renderGrid()
+            if (gameState) {
+                if (!pause) {
+                    removeTetromino()
+                    rotatePiece()
+                    if (!isValidMove()) rotatePiece(true)
+                    placeTetromino()
+                    renderGrid()
+                }
+            }
             break
 
         case ' ':
-            removeTetromino()
-            while (isValidMove()) {
-                x++
+            if (gameState) {
+                if (!pause) {
+                    removeTetromino()
+                    while (isValidMove()) {
+                        x++
+                    }
+                    x--
+                    placeTetromino()
+                    fixTetromino()
+                    spawnTetromino()
+                    renderGrid()
+                }
             }
-            x--
-            placeTetromino()
-            fixTetromino()
-            spawnTetromino()
-            renderGrid()
             break
         case 'Escape':
-            pauseMenu()
-            pause = !pause
-            if (!pause) {
-                requestAnimationFrame(gameLoop)
+            if (gameState) {
+                pauseMenu()
+                pause = !pause
+                if (!pause) {
+                    requestAnimationFrame(gameLoop)
+                }
             }
             break
 
@@ -267,10 +303,49 @@ function updateTimer(timestamp) {
     }
 }
 
+function startMenu() {
+    const startMenu = document.createElement('div')
+    startMenu.className = 'startMenu'
+    const startText = document.createElement('h1')
+    startText.textContent = 'New Game'
+    const startButton = document.createElement('button')
+    const button = document.createElement('div')
+    startButton.textContent = 'Start'
+    button.appendChild(startButton)
+    startMenu.appendChild(startText)
+    startMenu.appendChild(button)
+    board.appendChild(startMenu)
+    startButton.addEventListener('click', () => {
+        gameState = true
+        board.removeChild(startMenu)
+        requestAnimationFrame(gameLoop)
+    }
+    )
+}
+
+function gameOver() {
+    const startMenu = document.createElement('div')
+    startMenu.className = 'startMenu'
+    const startText = document.createElement('h1')
+    startText.textContent = 'Game Over'
+    const startButton = document.createElement('button')
+    const button = document.createElement('div')
+    startButton.textContent = 'Restart?'
+    button.appendChild(startButton)
+    startMenu.appendChild(startText)
+    startMenu.appendChild(button)
+    board.appendChild(startMenu)
+    startButton.addEventListener('click', () => {
+        location.reload()
+    }
+    )
+}
+
 function gameLoop(timestamp) {
     updateTimer(timestamp)
     if (gameover) {
-        alert('Game Over')
+        gameState = !gameState
+        gameOver()
         return
     }
     if (pause) return
@@ -282,7 +357,6 @@ function gameLoop(timestamp) {
     }
     requestAnimationFrame(gameLoop)
 }
-
 placeTetromino()
 renderGrid()
-requestAnimationFrame(gameLoop)
+startMenu()
