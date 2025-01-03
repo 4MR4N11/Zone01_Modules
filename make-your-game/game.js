@@ -110,11 +110,8 @@ function clearLines() {
             }
         }
         if (isFull) {
-            for (let row = line; row > 0; row--) {
-                for (let col = 0; col < COLUMNS; col++) {
-                    grid[row][col] = grid[row - 1][col]
-                }
-            }
+            grid.splice(line, 1);
+            grid.unshift(Array.from({ length: COLUMNS }).fill(0));
             score++
         }
     }
