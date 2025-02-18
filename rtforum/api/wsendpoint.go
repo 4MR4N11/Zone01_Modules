@@ -121,8 +121,28 @@ func WsEndpoint(w http.ResponseWriter, r *http.Request) {
 			continue
 		} else {
 			exists := false
-			err = 
+			err = config.DB.QueryRow(`SELECT EXISTS(SELECT 1 FROM users WHERE id = ?)`, message.Receiver).Scan(&exists)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+
+			_, err = config.DB.Exec(`INSERT INTO messages (sender_id, receiver_id, message) VALUES (?, ?, ?)`, message.SenderID, message.Receiver, message.Data)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			msg, err = json.Marshal(message)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			if err := NC.BroadcastMessage(message.Receiver, msg, messagetype); err != nil {
+				log.Println(err)
+				break
+			}
 		}
 
 	}
+	NC.RemoveConnection(int(session.UserId), conn)
 }
