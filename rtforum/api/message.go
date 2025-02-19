@@ -20,21 +20,21 @@ func MessageApi(w http.ResponseWriter, r *http.Request) {
 	sessionID := utils.GetSessionCookie(r)
 	session, err := config.SESSION.GetSession(sessionID)
 	if err != nil {
-		http.Error(w, "Session error", http.StatusInternalServerError)
+		utils.WriteJSON(w, http.StatusInternalServerError, "Session error", nil)
 		return
 	}
 	if session == nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		utils.WriteJSON(w, http.StatusUnauthorized, "Unauthorized", nil)
 		return
 	}
 	senderID, err := strconv.Atoi(r.URL.Query().Get("user_id"))
 	if err != nil {
-		http.Error(w, "Invalid user id", http.StatusBadRequest)
+		utils.WriteJSON(w, http.StatusBadRequest, "Invalid user ID", nil)
 		return
 	}
 	UserId := session.UserId
 	if UserId != int64(senderID) {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		utils.WriteJSON(w, http.StatusUnauthorized, "Unauthorized", nil)
 		return
 	}
 	messageID := r.URL.Query().Get("msg_id")
@@ -49,7 +49,7 @@ func MessageApi(w http.ResponseWriter, r *http.Request) {
 								  AND msgId < ? ORDER BY timestamp DESC LIMIT 10`, senderID, messageID)
 	}
 	if err != nil {
-		http.Error(w, "Database error", http.StatusInternalServerError)
+		utils.WriteJSON(w, http.StatusInternalServerError, "Database error", nil)
 		return
 	}
 	defer row.Close()
@@ -58,14 +58,10 @@ func MessageApi(w http.ResponseWriter, r *http.Request) {
 		var msg Msg
 		err = row.Scan(&msg.MsgId, &msg.SenderId, &msg.ReceiverId, &msg.Data, &msg.Timestamp)
 		if err != nil {
-			http.Error(w, "Database error", http.StatusInternalServerError)
+			utils.WriteJSON(w, http.StatusInternalServerError, "Database error", nil)
 			return
 		}
 		messages = append(messages, msg)
-	}
-	if err = row.Err(); err != nil {
-		http.Error(w, "Database error", http.StatusInternalServerError)
-		return
 	}
 	utils.WriteJSON(w, http.StatusOK, "Success", messages)
 }

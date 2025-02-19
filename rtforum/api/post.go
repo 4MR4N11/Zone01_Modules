@@ -23,7 +23,12 @@ func PostApi(w http.ResponseWriter, r *http.Request) {
 
 func handlePost(w http.ResponseWriter, r *http.Request) {
 	sessionId := utils.GetSessionCookie(r)
-	session, _ := config.SESSION.GetSession(sessionId)
+	session := config.IsAuth(sessionId)
+	if session == nil {
+		utils.WriteJSON(w, http.StatusUnauthorized, "You don't have the necessary permissions to access this. Please log in or check your access rights.", nil)
+		return
+	}
+	session, _ = config.SESSION.GetSession(sessionId)
 	if session == nil {
 		utils.WriteJSON(w, http.StatusBadRequest, "You don't have the necessary permissions to access this. Please log in or check your access rights.", nil)
 		return
