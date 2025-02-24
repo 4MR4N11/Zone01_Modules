@@ -7,28 +7,26 @@ import (
 	"net/http"
 )
 
-type pageData struct {
-	Error  string
-	Method string
-}
-
 type AuthResponse struct {
     SessionID string `json:"session_id"`
     UserID    int    `json:"user_id"`
     Username  string `json:"username"`
 }
 
+type Credentials struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 func LoginApi(w http.ResponseWriter, r *http.Request) {
-	page := pageData{
-		Method: "POST",
-	}
-	r.ParseForm()
-	username := r.FormValue("username")
-	password := r.FormValue("password")
-	user, err := services.LoginUser(username, password)
+	var creds Credentials
+	err := utils.ReadJSON(r, &creds)
 	if err != nil {
-		page.Error = err.Error()
-		w.WriteHeader(http.StatusBadRequest)
+		utils.WriteJSON(w, http.StatusBadRequest, "Invalid credentials", nil)
+		return
+	}
+	user, err := services.LoginUser(creds.Password, creds.Username)
+	if err != nil {
 		utils.WriteJSON(w, http.StatusBadRequest, err.Error(), nil)
 		return
 	}

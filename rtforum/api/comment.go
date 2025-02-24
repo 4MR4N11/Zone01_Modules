@@ -1,6 +1,7 @@
 package api
 
 import (
+	"log"
 	"net/http"
 	"strings"
 
@@ -37,7 +38,7 @@ func AddComment(w http.ResponseWriter, r *http.Request) {
 	commentRepo := models.NewCommentRepository()
 	isExist, err := postRepo.IsPostExist(comment.PostID)
 	if err != nil {
-		config.TMPL.RenderError(w, "error.html", "Internal server error", http.StatusInternalServerError)
+		log.Println(err)
 		return
 	}
 	if !isExist {
@@ -46,7 +47,7 @@ func AddComment(w http.ResponseWriter, r *http.Request) {
 	}
 	err = commentRepo.Create(&comment)
 	if err != nil {
-		config.TMPL.RenderError(w, "error.html", "Internal server error", http.StatusInternalServerError)
+		log.Println(err)
 		return
 	}
 	utils.WriteJSON(w, 200, "Your comment has been added successfully! Thanks for sharing your thoughts!", comment)

@@ -15,6 +15,5 @@ const (
 
 var (
 	DB      *sql.DB          = nil
-	TMPL    *TemplateManager = nil
 	SESSION *SessionManager  = nil
 )
