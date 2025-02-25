@@ -1,26 +1,19 @@
 #include "header.h"
+namespace fs = std::filesystem;
 
-const char *getHostname()
+char *getHostname()
 {
-    std::vector<char> computerName;
+    char *computerName = (char *)malloc(1024);
 #ifdef _WIN32 || _WIN64
-    DWORD size = 0;
-    GetComputerNameExA(ComputerNameDnsHostname, nullptr, &size);  // Get required size
-    if (size > 0) {
-        std::vector<char> computerName(size);
-        if (GetComputerNameExA(ComputerNameDnsHostname, computerName.data(), &size)) {
-            return computerName.data();
-        } else {
-            return "unknown";
-        }
+    DWORD size = sizeof(computerName) / sizeof(computerName[0]);
+    if (GetComputerNameA(computerName, &size)) {
+        return computerName;
+    } else {
+        return "unknown";
     }
 #elif __APPLE__ || __MACH__ || __unix || __unix__ || __linux || __FreeBSD__
-    long max_size = sysconf(_SC_HOST_NAME_MAX);
-    if (max_size == -1) max_size = 255;
-    computerName.resize(max_size + 1);
-    
-    if (gethostname(computerName.data(), computerName.size()) == 0) {
-        return computerName.data();
+    if (gethostname(computerName, sizeof(computerName)) == 0) {
+        return computerName;
     }
 #else
     return "Unknown";
@@ -28,27 +21,19 @@ const char *getHostname()
 return "Unknown";
 }
 
-const char *getUserName()
+char *getUserName()
 {
-    std::vector<char> userName;
+    char *userName = (char * )malloc(1024);
 #ifdef _WIN32 || _WIN64
-    DWORD size = 0;
-    GetUserNameA(nullptr, &size);  // Get required size
-    if (size > 0) {
-        std::vector<char> userName(size);
-        if (GetUserNameA(userName.data(), &size)) {
-            return userName.data();
-        } else {
-            return "unknown";
-        }
+    DWORD size = sizeof(userName) / sizeof(userName[0]);
+    if (GetUserNameA(userName, &size)) {
+        return userName;
+    } else {
+        return "unknown";
     }
 #elif __APPLE__ || __MACH__ || __unix || __unix__ || __linux || __FreeBSD__
-    long max_size = sysconf(_SC_LOGIN_NAME_MAX);
-    if (max_size == -1) max_size = 255;
-    userName.resize(max_size + 1);
-
-    if (getlogin_r(userName.data(), userName.size()) == 0)
-        return userName.data();
+    if (getlogin_r(userName, sizeof(userName)) == 0)
+        return userName;
 #else
     return "Unknown";
 #endif
@@ -57,30 +42,33 @@ return "Unknown";
 
 int getNumTasks()
 {
-    int numTasks = 0;
-    std::ifstream file("/proc/stat");
-    if (file.is_open())
-    {
-        std::string line;
-        while (std::getline(file, line))
-        {
-            if (line.find("procs_") == 0)
-            {
-                int value;
-                if (sscanf(line.c_str(), "%*s %d", &value) == 1) {
-                    numTasks += value;
+    int count = 0;
+
+    for (const auto& entry : fs::directory_iterator("/proc")) {
+        if (entry.is_directory()) {
+            std::string filename = entry.path().filename().string();
+            if (!filename.empty() && std::all_of(filename.begin(), filename.end(), ::isdigit)) {
+                std::ifstream status_file(entry.path() / "status");
+                if (status_file.is_open()) {
+                    std::string line;
+                    while (std::getline(status_file, line)) {
+                        if (line.find("Name:") == 0) {
+                            count++;
+                            break;
+                        }
+                    }
                 }
             }
         }
-        file.close();
     }
-    return numTasks;
+    return count;
 }
 
 SystemInfo *getSystemInfo()
 {
     SystemInfo *info = (SystemInfo *)malloc(sizeof(SystemInfo));
-    info->osName = getOsName();
+    info->osName = (char *)malloc(sizeof(getOsName()));
+    info->osName =(char *)getOsName();
     info->hostname = getHostname();
     info->numTasks = getNumTasks();
     info->cpu = CPUinfo();

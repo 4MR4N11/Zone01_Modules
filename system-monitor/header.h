@@ -10,6 +10,8 @@
 #include <vector>
 #include <iostream>
 #include <cmath>
+#include <filesystem>
+#include <algorithm>
 // lib to read from file
 #include <fstream>
 // for the name of the computer and the logged in user
@@ -96,21 +98,16 @@ struct RX
     int compressed;
 };
 
-#ifdef _WIN32
-    #include <windows.h>
-#endif
-
 // student TODO : system stats
 struct SystemInfo{
-    string osName;
-    string user;
-    string hostname;
+    char *osName;
+    char *user;
+    char *hostname;
     int numTasks;
-    string cpu;
-} ;
-
-string CPUinfo();
+    char *cpu;
+};
 SystemInfo *getSystemInfo();
+char *CPUinfo();
 const char *getOsName();
 
 // student TODO : memory and processes

@@ -1,9 +1,9 @@
 #include "header.h"
 
 // get cpu id and information, you can use `proc/cpuinfo`
-string CPUinfo()
+char *CPUinfo()
 {
-    char CPUBrandString[0x40];
+    char *CPUBrandString = (char *)malloc(0x40);
     unsigned int CPUInfo[4] = {0, 0, 0, 0};
 
     // unix system
@@ -26,8 +26,7 @@ string CPUinfo()
         else if (i == 0x80000004)
             memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
     }
-    string str(CPUBrandString);
-    return str;
+    return CPUBrandString;
 }
 
 // getOsName, this will get the OS of the current computer
@@ -48,5 +47,4 @@ const char *getOsName()
 #else
     return "Other";
 #endif
-return "Unknown";
 }

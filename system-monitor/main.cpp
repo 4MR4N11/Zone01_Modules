@@ -1,6 +1,6 @@
 #include "header.h"
 #include <SDL.h>
-
+#include <array>
 /*
 NOTE : You are free to change the code as you wish, the main objective is to make the
        application work and pass the audit.
@@ -44,14 +44,18 @@ using namespace gl;
 // systemWindow, display information for the system monitorization
 void systemWindow(const char *id, ImVec2 size, ImVec2 position)
 {
-    SystemInfo *info = getSystemInfo();
     ImGui::Begin(id);
     ImGui::SetWindowSize(id, size);
     ImGui::SetWindowPos(id, position);
-    ImGui::Text("Operating System used: %s", info->osName);
-    ImGui::Text("Computer Name: %s", info->hostname);
-    ImGui::Text("User logged in: %s", info->user);
-    ImGui::Text("Number of tasks: %d", info->numTasks);
+    SystemInfo *sysInfo = nullptr;
+    sysInfo = getSystemInfo();
+    ImGui::Text("Operating System used: %s", sysInfo->osName);
+    ImGui::Text("Computer Name: %s", sysInfo->hostname);
+    ImGui::Text("User logged in: %s", sysInfo->user);
+    ImGui::Text("Number of tasks: %d", sysInfo->numTasks);
+    ImGui::Text("CPU: %s", sysInfo->cpu);
+    static std::array<float, 10> values = {1.0f, 2.0f, 10.5f, 3.0f, 2.5f, 2.0f, 1.0f, 1.2f, 1.8f, 2.2f};
+    ImGui::PlotLines("CPU Usage", values.data(), values.size(), 0, NULL, 0.0f, 100.0f, ImVec2(0, 150));
     // student TODO : add code here for the system window
 
     ImGui::End();
@@ -63,7 +67,7 @@ void memoryProcessesWindow(const char *id, ImVec2 size, ImVec2 position)
     ImGui::Begin(id);
     ImGui::SetWindowSize(id, size);
     ImGui::SetWindowPos(id, position);
-    
+
     // student TODO : add code here for the memory and process information
 
     ImGui::End();

@@ -117,3 +117,4 @@ $(EXE): $(OBJS)
 
 clean:
 	rm -f $(EXE) $(OBJS)
+re: clean all
