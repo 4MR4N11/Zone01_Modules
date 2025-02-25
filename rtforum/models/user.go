@@ -3,7 +3,6 @@ package models
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 
 	"forum/config"
 )
@@ -16,10 +15,11 @@ var (
 type User struct {
 	ID       int64  `json:"id"`
 	Email    string `json:"email"`
-	Age      int64  `json:"age,string"`
+	Age      string  `json:"age"`
 	FirstName string `json:"firstname"`
 	LastName string `json:"lastname"`
 	Username string `json:"username"`
+	Gender  string `json:"gender"`
 	Password string `json:"password"`
 }
 
@@ -32,10 +32,9 @@ func NewUserRepository() *UserRepository {
 }
 
 func (r *UserRepository) CreateUser(user *User) error {
-	query := "INSERT INTO users (email, username, age, firstname, lastname, password) VALUES (?,?,?,?,?,?)"
-	result, err := r.db.Exec(query, user.Email, user.Username, user.Age, user.FirstName, user.LastName, user.Password)
+	query := "INSERT INTO users (email, username, age, firstname, lastname, gender, password) VALUES (?,?,?,?,?,?,?)"
+	result, err := r.db.Exec(query, user.Email, user.Username, user.Age, user.FirstName, user.LastName, user.Gender, user.Password)
 	if err != nil {
-		fmt.Println("test")
 		return err
 	}
 	user.ID, _ = result.LastInsertId()

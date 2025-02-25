@@ -6,11 +6,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"forum/config"
 	c "forum/config"
 	"forum/models"
 	"forum/utils"
-	"forum/handlers"
 )
 
 const (
@@ -80,10 +78,10 @@ func PostFilter(w http.ResponseWriter, r *http.Request) {
 	count := len(posts)
 
 	currentPagePosts := getCurrentPagePosts(posts, currPage, limit, count)
-	page := handlers.NewPageStruct("forum", sessionID, nil)
-	page.Data = handlers.IndexStruct{
+	page := NewPageStruct("forum", sessionID, nil)
+	page.Data = IndexStruct{
 		Posts:       currentPagePosts,
-		TotalPages:  int(math.Ceil(float64(count) / config.LIMIT_PER_PAGE)),
+		TotalPages:  int(math.Ceil(float64(count) / c.LIMIT_PER_PAGE)),
 		CurrentPage: currPage,
 		Query:       query,
 		Option:      postType,
@@ -106,7 +104,7 @@ func getPostsFilter(posts []*models.Post) ([]*models.Post, error) {
 
 func getCurrentPagePosts(posts []*models.Post, currentPage int, limit int, count int) []*models.Post {
 	if (currentPage-1)*limit > count {
-		currentPage = max(int(math.Ceil(float64(count)/config.LIMIT_PER_PAGE)), 1)
+		currentPage = max(int(math.Ceil(float64(count)/c.LIMIT_PER_PAGE)), 1)
 	}
 	return posts[(currentPage-1)*limit : min(count, (currentPage-1)*limit+limit)]
 }

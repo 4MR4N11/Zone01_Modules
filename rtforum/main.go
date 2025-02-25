@@ -23,6 +23,7 @@ func main() {
 	http.HandleFunc("/", handlers.IndexHandler)
 	http.HandleFunc("/api/register", api.RegisterApi)
 	http.HandleFunc("/api/post", api.PostApi)
+	http.HandleFunc("/api/posts", api.GetPostsApi)
 	http.HandleFunc("/api/react", api.ReactToPostHandler)
 	http.HandleFunc("/api/add/comment", api.AddComment)
 	http.HandleFunc("/api/like/comment", api.HandleLikeComment)

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"forum/api"
 	"forum/config"
 	c "forum/config"
 	"forum/models"
@@ -79,7 +80,7 @@ func PostFilter(w http.ResponseWriter, r *http.Request) {
 	count := len(posts)
 
 	currentPagePosts := getCurrentPagePosts(posts, currPage, limit, count)
-	page := NewPageStruct("forum", sessionID, nil)
+	page := api.NewPageStruct("forum", sessionID, nil)
 	page.Data = IndexStruct{
 		Posts:       currentPagePosts,
 		TotalPages:  int(math.Ceil(float64(count) / config.LIMIT_PER_PAGE)),

@@ -1,14 +1,12 @@
-package handlers
+package api
 
 import (
+	"forum/models"
+	"forum/utils"
 	"math"
 	"net/http"
 	"strconv"
-
-	"forum/api"
 	"forum/config"
-	"forum/models"
-	"forum/utils"
 )
 
 type IndexStruct struct {
@@ -19,20 +17,7 @@ type IndexStruct struct {
 	Option      int
 }
 
-func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		config.TMPL.RenderError(w, "error.html", "The requested page could not be found", http.StatusNotFound)
-		return
-	}
-	switch r.Method {
-	case http.MethodGet:
-		indexGet(w, r)
-	default:
-		config.TMPL.RenderError(w, "error.html", "The HTTP method used in the request is invalid. Please ensure you're using the correct method.", http.StatusMethodNotAllowed)
-	}
-}
-
-func indexGet(w http.ResponseWriter, r *http.Request) {
+func GetPostsApi(w http.ResponseWriter, r *http.Request) {
 	pageStr := r.URL.Query().Get("page")
 	currPage, err := strconv.Atoi(pageStr)
 	if err != nil || currPage < 1 {
@@ -43,21 +28,21 @@ func indexGet(w http.ResponseWriter, r *http.Request) {
 	postRep := models.NewPostRepository()
 	posts, err := getPosts(currPage, limit)
 	if err != nil {
-		config.TMPL.RenderError(w, "error.html", err.Error(), http.StatusInternalServerError)
+		utils.WriteJSON(w, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 	count, err := postRep.Count()
 	if err != nil {
-		config.TMPL.RenderError(w, "error.html", err.Error(), http.StatusInternalServerError)
+		utils.WriteJSON(w, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
-	page := api.NewPageStruct("forum", session, nil)
+	page := NewPageStruct("forum", session, nil)
 	page.Data = IndexStruct{
 		Posts:       posts,
 		TotalPages:  int(math.Ceil(float64(count) / config.LIMIT_PER_PAGE)),
 		CurrentPage: currPage,
 	}
-	config.TMPL.Render(w, "index.html", page)
+	utils.WriteJSON(w, http.StatusOK, "OK", page)
 }
 
 func getPosts(currPage, limit int) ([]*models.Post, error) {
