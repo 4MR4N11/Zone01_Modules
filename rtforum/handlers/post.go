@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"forum/api"
 	"forum/config"
 	"forum/models"
 	"forum/utils"
@@ -46,6 +47,6 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 		Post:     *post,
 	}
 	session := utils.GeTCookie("session", r)
-	page := NewPageStruct(post.Title, session, postData)
+	page := api.NewPageStruct(post.Title, session, postData)
 	config.TMPL.Render(w, "post.html", page)
 }

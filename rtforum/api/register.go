@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	"forum/models"
@@ -32,6 +33,30 @@ func RegisterApi(w http.ResponseWriter, r *http.Request) {
 	}
 	if !utils.IsValidEmail(user.Email) {
 		utils.WriteJSON(w, http.StatusBadRequest, "The email address entered is invalid.", nil)
+		return
+	}
+	if !utils.IsBetween(user.FirstName, 3, 25) {
+		utils.WriteJSON(w, http.StatusBadRequest, "The full name must be between 3 and 25 characters in length", nil)
+		return
+	}
+	if !utils.IsBetween(user.LastName, 3, 25) {
+		utils.WriteJSON(w, http.StatusBadRequest, "The full name must be between 3 and 25 characters in length", nil)
+		return
+	}
+	if user.Gender == "" {
+		utils.WriteJSON(w, http.StatusBadRequest, "Gender is required", nil)
+		return
+	}
+	if user.Age == "" {
+		user.Age = "0"
+	}
+	age, err := strconv.Atoi(user.Age)
+	if err != nil {
+		utils.WriteJSON(w, http.StatusBadRequest, "The age must be a numeric value", nil)
+		return
+	}
+	if age < 16 {
+		utils.WriteJSON(w, http.StatusBadRequest, "You must be at least 16 years old to register", nil)
 		return
 	}
 	err = services.RegisterUser(&user)
