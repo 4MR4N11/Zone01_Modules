@@ -34,7 +34,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <map>
-
+#include <array>
+#include <chrono>
 using namespace std;
 
 struct CPUStats
@@ -109,7 +110,9 @@ struct SystemInfo{
 SystemInfo *getSystemInfo();
 char *CPUinfo();
 const char *getOsName();
-
+float getCurrentCpuUsage();
+void init();
+void shiftArr(std::array<float, 10> &values, float newValue);
 // student TODO : memory and processes
 
 // student TODO : network

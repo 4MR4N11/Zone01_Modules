@@ -40,7 +40,12 @@ using namespace gl;
 #else
 #include IMGUI_IMPL_OPENGL_LOADER_CUSTOM
 #endif
-
+static std::array<float, 10> values = {};
+static bool freeze = true;
+static int updateIntervalMs = 1;
+static float scaling = 100.0f;
+static auto now = std::chrono::steady_clock::now();
+static auto last_update_time = now;
 // systemWindow, display information for the system monitorization
 void systemWindow(const char *id, ImVec2 size, ImVec2 position)
 {
@@ -54,8 +59,40 @@ void systemWindow(const char *id, ImVec2 size, ImVec2 position)
     ImGui::Text("User logged in: %s", sysInfo->user);
     ImGui::Text("Number of tasks: %d", sysInfo->numTasks);
     ImGui::Text("CPU: %s", sysInfo->cpu);
-    static std::array<float, 10> values = {1.0f, 2.0f, 10.5f, 3.0f, 2.5f, 2.0f, 1.0f, 1.2f, 1.8f, 2.2f};
-    ImGui::PlotLines("CPU Usage", values.data(), values.size(), 0, NULL, 0.0f, 100.0f, ImVec2(0, 150));
+    ImGui::BeginTabBar("");
+    ImGui::Checkbox("animation", &freeze);
+    ImGui::SliderInt("FPS", &updateIntervalMs, 1, 60);
+    ImGui::SliderFloat("Scale", &scaling, 1.0f, 200.0f);
+    if (ImGui::BeginTabItem("CPU"))
+    {
+        if (freeze) {
+            now = std::chrono::steady_clock::now();
+            auto value = -updateIntervalMs + 61;
+            cout << "value: " << value << endl;
+            if ((((now - last_update_time)/10000000).count() >= value))
+            {
+                cout << "here" << endl;
+                shiftArr(values, getCurrentCpuUsage());
+                last_update_time = now;
+            }
+        }
+        ImGui::Dummy(ImVec2(0, 70));
+        ImGui::PlotLines("CPU", values.data(), values.size(), 0, NULL, 0.0f, scaling, ImVec2(0, 150));
+        ImGui::EndTabItem();
+    }
+    if (ImGui::BeginTabItem("Fan"))
+    {
+        ImGui::PlotLines("FAN", values.data(), values.size(), 0, NULL, 0.0f, 100.0f, ImVec2(0, 150));
+        ImGui::EndTabItem();
+    }
+    if (ImGui::BeginTabItem("Thermal"))
+    {
+        ImGui::PlotLines("THERMAL", values.data(), values.size(), 0, NULL, 0.0f, 100.0f, ImVec2(0, 150));
+        ImGui::EndTabItem();
+    }
+    // ImGui::DrawTabsBackground();
+    // ImGui::BeginTabItem("CPU Usage");
+    ImGui::EndTabBar();
     // student TODO : add code here for the system window
 
     ImGui::End();
@@ -157,6 +194,7 @@ int main(int, char **)
 
     // Main loop
     bool done = false;
+    init();
     while (!done)
     {
         // Poll and handle events (inputs, window resize, etc.)

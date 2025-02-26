@@ -40,6 +40,16 @@ char *getUserName()
 return "Unknown";
 }
 
+
+void shiftArr(std::array<float, 10> &values, float newValue)
+{
+    for (int i = 0; i < 9; i++)
+    {
+        values[i] = values[i + 1];
+    }
+    values[9] = newValue;
+}
+
 int getNumTasks()
 {
     int count = 0;
